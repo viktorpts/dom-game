@@ -6,11 +6,6 @@ Object.assign(window.game, (function () {
     const enemySlot = document.getElementById('enemies');
 
     const player = game.createCharacter('player');
-    const enemies = [
-        game.createCharacter('rat'),
-        game.createCharacter('skeleton'),
-        game.createCharacter('rat'),
-    ];
 
     const encounterController = game.encounterController(enemySlot, player);
 
@@ -21,32 +16,35 @@ Object.assign(window.game, (function () {
 
     playerSlot.appendChild(player.element);
     playerSlot.appendChild(controls);
-    enemies.forEach(e => enemySlot.appendChild(e.element));
 
     game.events.onBeginTurn.subscribe(onBeginTurn);
-    game.events.onEncounterEnd.subscribe((victory) => {
-        if (victory) {
-            alert('Enemies defeated!');
-        } else {
-            alert('You Died');
-            disableControls();
-        }
-    });
+    game.events.onEncounterEnd.subscribe(onEncounterEnd);
 
+    let difficulty = 1;
     // Begin encounter as player
-    encounterController.enter(enemies);
+    encounterController.enter(game.generateEncounter(difficulty));
 
     function onBeginTurn(controller) {
         if (controller.character.ai) {
-            console.log('AI controlled');
             disableControls();
             setTimeout(() => {
                 encounterController.onEnemyAttack();
                 encounterController.selectTarget({ target: player.element });
             }, 500);
         } else {
-            console.log('Player turn');
             enableControls();
+        }
+    }
+
+    function onEncounterEnd(victory) {
+        if (victory) {
+            alert('Enemies defeated!');
+            difficulty++;
+            encounterController.enter(game.generateEncounter(difficulty));
+            disableControls();
+        } else {
+            alert('You Died');
+            disableControls();
         }
     }
 

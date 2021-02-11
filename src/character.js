@@ -11,12 +11,14 @@ Object.assign(window.game, (function() {
         },
         rat: {
             name: 'Giant Rat',
+            ai: true,
             img: 'rat.png',
             hp: 30,
             dmg: 10
         },
         skeleton: {
             name: 'Skeleton',
+            ai: true,
             img: 'skeleton.png',
             hp: 50,
             dmg: 15

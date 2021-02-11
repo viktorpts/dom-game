@@ -12,40 +12,38 @@ Object.assign(window.game, (function () {
         game.createCharacter('rat'),
     ];
 
+    const encounterController = game.encounterController(enemySlot, player);
+
     const controls = e('div', { id: 'controls' },
-        e('button', { onClick: onPlayerAttack }, 'Attack')
+        e('button', { onClick: encounterController.onPlayerAttack }, 'Attack')
     );
+    disableControls();
 
     playerSlot.appendChild(player.element);
     playerSlot.appendChild(controls);
     enemies.forEach(e => enemySlot.appendChild(e.element));
 
-    enemySlot.addEventListener('click', selectTarget);
+    game.events.onBeginTurn.subscribe(onBeginTurn);
 
-    function selectTarget({ target }) {
-        while (target != enemySlot && target.classList.contains('targettable') == false) {
-            target = target.parentNode;
-        }
-        if (target.classList.contains('targettable')) {
-            const selected = enemies.find(e => e.element == target);
-            if (selected) {
-                player.character.attack(selected.character);
-            }
-            disableTargetting();
+    // Begin encounter as player
+    encounterController.enter(enemies);
+
+    function onBeginTurn(controller) {
+        if (controller.character.ai) {
+            console.log('AI controlled');
+            disableControls();
+            
         } else {
-            disableTargetting();
+            console.log('Player turn');
+            enableControls();
         }
     }
 
-    function onPlayerAttack() {
-        enableTargetting();
+    function enableControls() {
+        [...controls.children].forEach(c => c.disabled = false);
     }
 
-    function enableTargetting() {
-        enemies.filter(e => e.character.alive).forEach(e => e.element.classList.add('targettable'));
-    }
-
-    function disableTargetting() {
-        enemies.forEach(e => e.element.classList.remove('targettable'));
+    function disableControls() {
+        [...controls.children].forEach(c => c.disabled = true);
     }
 })());

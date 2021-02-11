@@ -24,6 +24,14 @@ Object.assign(window.game, (function () {
     enemies.forEach(e => enemySlot.appendChild(e.element));
 
     game.events.onBeginTurn.subscribe(onBeginTurn);
+    game.events.onEncounterEnd.subscribe((victory) => {
+        if (victory) {
+            alert('Enemies defeated!');
+        } else {
+            alert('You Died');
+            disableControls();
+        }
+    });
 
     // Begin encounter as player
     encounterController.enter(enemies);
@@ -32,7 +40,10 @@ Object.assign(window.game, (function () {
         if (controller.character.ai) {
             console.log('AI controlled');
             disableControls();
-            
+            setTimeout(() => {
+                encounterController.onEnemyAttack();
+                encounterController.selectTarget({ target: player.element });
+            }, 500);
         } else {
             console.log('Player turn');
             enableControls();

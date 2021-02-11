@@ -1,7 +1,8 @@
 window.game = (function() {
     return {
         events: {
-            onBeginTurn: createObserver()
+            onBeginTurn: createObserver(),
+            onEncounterEnd: createObserver(),
         }
     };
 

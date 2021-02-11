@@ -13,7 +13,9 @@ Object.assign(window.game, (function () {
 
         return {
             enter,
-            onPlayerAttack
+            onPlayerAttack,
+            onEnemyAttack,
+            selectTarget
         };
 
         function onPlayerAttack() {
@@ -25,13 +27,14 @@ Object.assign(window.game, (function () {
         }
 
         function selectTarget({ target }) {
-            while (target != enemySlot && target.classList.contains('targettable') == false) {
+            console.log(target);
+            while (target && target.classList && target.classList.contains('targettable') == false) {
                 target = target.parentNode;
             }
-            if (target.classList.contains('targettable')) {
+            if (target && target.classList && target.classList.contains('targettable')) {
                 const selected = characters.find(e => e.element == target);
                 if (selected) {
-                    player.character.attack(selected.character);
+                    characters[initiative].character.attack(selected.character);
                 }
                 disableTargetting();
                 nextTurn();
@@ -51,7 +54,16 @@ Object.assign(window.game, (function () {
         }
 
         function nextTurn() {
-            initiative = (initiative + 1) % characters.length;
+            if (player.character.alive == false) {
+                game.events.onEncounterEnd(false);
+            } else if (characters.filter(c => c.character.alive).length == 1) {
+                game.events.onEncounterEnd(true);
+            }
+
+            do {
+                initiative = (initiative + 1) % characters.length;
+            } while (characters[initiative].character.alive == false );
+
             characters.forEach(c => c.element.classList.remove('active'));
             characters[initiative].element.classList.add('active');
             game.events.onBeginTurn(characters[initiative]);

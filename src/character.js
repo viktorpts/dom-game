@@ -4,7 +4,7 @@
 Object.assign(window.game, (function() {
     const templates = {
         player: {
-            name: 'Player',
+            name: 'Peter',
             img: 'player.png',
             hp: 100,
             dmg: 25

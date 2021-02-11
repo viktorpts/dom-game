@@ -2,7 +2,11 @@ function e(type, attributes = {}, ...content) {
     const result = document.createElement(type);
 
     for (let attr in attributes) {
-        result[attr] = attributes[attr];
+        if (attr.substring(0,2) == 'on') {
+            result.addEventListener(attr.substring(2).toLowerCase(), attributes[attr]);
+        } else {
+            result[attr] = attributes[attr];
+        }
     }
 
     content.forEach(e => {

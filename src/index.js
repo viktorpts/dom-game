@@ -1,72 +1,26 @@
-/* globals e */
+/* globals e, game */
 
-function createCharacter(name, hp, dmg) {
-    const character = {
-        alive: true,
-        name,
-        maxHp: hp,
-        hp,
-        dmg,
-        attack,
-        takeDamage
-    };
 
-    const element = createCharacterCard(character);
+Object.assign(window.game, (function () {
+    const playerSlot = document.getElementById('player');
+    const enemySlot = document.getElementById('enemies');
 
-    return {
-        character,
-        element
-    };
+    const player = game.createCharacter('player');
+    const enemies = [
+        game.createCharacter('rat'),
+        game.createCharacter('skeleton'),
+        game.createCharacter('rat'),
+    ];
 
-    function attack(target) {
-        console.log(`${character.name} attacks ${target.name} for ${character.dmg}`);
-        target.takeDamage(character.dmg);
-    }
-
-    function takeDamage(incomingDmg) {
-        console.log(`${character.name} took ${incomingDmg} damage`);
-        character.hp = Math.max(character.hp - incomingDmg, 0);
-        if (character.hp == 0) {
-            character.alive = false;
-        }
-        element.update();
-    }
-}
-
-function createCharacterCard(character) {
-    const stats = {
-        hp: e('span', {}, `${character.hp} / ${character.maxHp}`),
-    };
-
-    const element = e('article', { className: 'character-card' },
-        e('div', { className: 'portrait' }, e('img', { src: 'assets/player.png' })),
-        e('div', { className: 'description' }, 
-            e('h3', {}, character.name),
-            e('ul', { className: 'stats'}, 
-                e('li', {}, 'HP: ', stats.hp),
-                e('li', {}, 'Damage: ', e('span', {}, character.dmg)),
-            )
-        )
+    const controls = e('div', { id: 'controls' },
+        e('button', { onClick: onPlayerAttack }, 'Attack')
     );
-    element.update = update;
 
-    return element;
+    playerSlot.appendChild(player.element);
+    playerSlot.appendChild(controls);
+    enemies.forEach(e => enemySlot.appendChild(e.element));
 
-    function update() {
-        stats.hp.textContent = `${character.hp} / ${character.maxHp}`;
-        if (character.alive == false) {
-            element.classList.add('wasted');
-        }
+    function onPlayerAttack() {
+        enemies.forEach(e => e.element.classList.add('targettable'));
     }
-}
-
-const player = createCharacter('Player', 100, 25);
-const enemy = createCharacter('Bad Guy', 50, 10);
-
-document.getElementById('player').appendChild(player.element);
-document.getElementById('enemies').appendChild(enemy.element);
-
-window.game = {
-    player,
-    enemy
-};
+})());
